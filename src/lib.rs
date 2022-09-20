@@ -36,11 +36,31 @@ impl Game {
         for w in weapons {
             let (damage, checked) = w.get_damage_to(unit, target, roller);
             for idx in 0..checked {
-                sum_damage += target.add_damage(damage.get(roller));
+                sum_damage += target.add_damage(damage.get(roller), w.get_strength());
             }
         }
         warn!("[{}] Make {} damage to [{}]", unit.get_name(), sum_damage, target.get_name());
     }
+
+    pub fn full_meele_attack_to(
+        target : &mut dyn Unit,
+        unit : &mut dyn Unit,
+        meele_idx : usize,
+        roller : &mut Roller) {
+    let weapons = unit.get_meele_weapons();
+    let mut sum_damage = 0;
+    if weapons.len() <= meele_idx {
+        return;
+    }
+    let w = &weapons[meele_idx];
+
+    let (damage, checked) = w.get_damage_to(unit, target, roller);
+    for idx in 0..checked {
+        sum_damage += target.add_damage(damage.get(roller), w.get_strength());
+    }
+
+    warn!("[{}] Make {} damage to [{}]", unit.get_name(), sum_damage, target.get_name());
+}
 }
 
 impl Game {

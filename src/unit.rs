@@ -1,6 +1,6 @@
 use log::warn;
-use crate::Roller;
-use crate::weapon::RangeWeapon;
+use crate::{Roller, WahValue};
+use crate::weapon::{RangeWeapon, MeeleWeapon, BaseWeapon};
 use log::*;
 
 pub enum GamePhase {
@@ -18,9 +18,13 @@ pub trait Unit {
     fn get_toughness(&self) -> i32;
     fn get_ranged_weapons(&self) -> &Vec<Box<dyn RangeWeapon>>;
     fn get_involve(&self) -> i32;
-    fn add_damage(&mut self, damage : i32) -> i32;
+    fn add_damage(&mut self, damage : i32, s : i32) -> i32;
     fn next_move(&mut self);
     fn set_phase(&mut self, phase : &GamePhase);
+    fn get_ignore_ap(&self) -> i32;
+    fn get_meele_attack_count(&self) -> WahValue;
+    fn is_in_meele_battle(&self) -> bool;
+    fn get_meele_weapons(&self) -> &Vec<Box<dyn MeeleWeapon>>;
 
     fn pretty_report_ballistic_skill(&self, roller : &mut Roller) {
         let weapons = self.get_ranged_weapons();

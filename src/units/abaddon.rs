@@ -1,10 +1,11 @@
-use crate::{unit::Unit, weapon::{RangeWeapon, StandardRangeWeapon, RangeWeaponType}, WahValue};
-
+use crate::{unit::Unit, weapon::{RangeWeapon, StandardRangeWeapon, RangeWeaponType, MeeleWeapon, StandardMeeleWeapon}, WahValue};
+use log::*;
 
 pub struct Abaddon {
     health : i32,
     name : String,
     range_weapons : Vec<Box<dyn RangeWeapon>>,
+    meele_weapons : Vec<Box<dyn MeeleWeapon>>,
     first_save : bool,
     phase_end_health : i32
 }
@@ -20,6 +21,26 @@ impl Abaddon {
             name: "Talon of Horus (shooting)".to_string(),
         })
     }
+
+    fn get_meele_1() -> Box<dyn MeeleWeapon> {
+        Box::new(StandardMeeleWeapon {
+            damage: WahValue::Fixed(3),
+            attack_mul : 1,
+            strength: 6 + 3,
+            armor_piercing: -4,
+            name: "Drach’nyen".to_string(),
+        })
+    }
+
+    fn get_meele_2() -> Box<dyn MeeleWeapon> {
+        Box::new(StandardMeeleWeapon {
+            damage: WahValue::Fixed(1),
+            attack_mul : 2,
+            strength: 6,
+            armor_piercing: -4,
+            name: "Talon of Horus (melee)".to_string(),
+        })
+    }
 }
 
 impl Default for Abaddon {
@@ -29,6 +50,7 @@ impl Default for Abaddon {
             health: 9, 
             name: "ABADDON THE DESPOILER".to_string(), 
             range_weapons: vec![Abaddon::get_shooting()], 
+            meele_weapons: vec![Abaddon::get_meele_1()],
             first_save: true, 
             phase_end_health: 9 - 3
         }
@@ -72,13 +94,17 @@ impl Unit for Abaddon {
         4
     }
 
-    fn add_damage(&mut self, damage : i32) -> i32 {
+    fn add_damage(&mut self, damage : i32, s : i32) -> i32 {
         if self.first_save {
             self.first_save = false;
             0
         } else {
+            let mut cur_damage = damage;
+            if s >= 2 * self.get_toughness() {
+                cur_damage -= 1;
+            }
             let start = self.health;
-            self.health -= damage;
+            self.health -= cur_damage;
             self.health = self.health.max(self.phase_end_health);
             start - self.health
         }
@@ -90,5 +116,40 @@ impl Unit for Abaddon {
 
     fn set_phase(&mut self, phase : &crate::unit::GamePhase) {
         self.phase_end_health = self.health - 3;
+    }
+
+    fn get_ignore_ap(&self) -> i32 {
+        1
+    }
+
+    fn pretty_report_ballistic_skill(&self, roller : &mut crate::Roller) {
+        let weapons = self.get_ranged_weapons();
+        for weapon in weapons {
+            let attack_count = weapon.get_attack_count().get(roller);
+            let mut good_shoot = 0;
+            let bs = self.get_ballistic_skill().unwrap();
+            for idx in 0..attack_count {
+                let roll = roller.d6();
+                if roll >= bs {
+                    good_shoot += 1;
+                } else {
+
+                }
+            }
+
+            println!("{} : {} from {}", weapon.get_name(), good_shoot, attack_count);
+        }
+    }
+
+    fn get_meele_attack_count(&self) -> WahValue {
+        WahValue::Fixed(8)
+    }
+
+    fn is_in_meele_battle(&self) -> bool {
+        true
+    }
+    
+    fn get_meele_weapons(&self) -> &Vec<Box<dyn MeeleWeapon>> {
+        &self.meele_weapons
     }
 }

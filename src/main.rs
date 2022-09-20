@@ -146,24 +146,64 @@ fn main() {
             fortress1.set_phase(&GamePhase::Shoot);
             fortress2.set_phase(&GamePhase::Shoot);
             
-            Game::full_range_attack_to(
-                &mut fortress2,
-                &mut fortress1,
-                &mut roller
-            );
-            Game::full_range_attack_to(
-                &mut fortress1,
-                &mut fortress2,
-                &mut roller
-            );
+            //shoot phase
+            if fortress1.is_in_meele_battle() {
+
+            } else {
+                Game::full_range_attack_to(
+                    &mut fortress2,
+                    &mut fortress1,
+                    &mut roller
+                );
+            }
+            if fortress2.get_health() > 0 {
+                if fortress2.is_in_meele_battle() {
+
+                } else {
+                    Game::full_range_attack_to(
+                        &mut fortress1,
+                        &mut fortress2,
+                        &mut roller
+                    );
+                }
+            }
+
+            //attack phase
+            fortress1.set_phase(&GamePhase::Meele);
+            fortress2.set_phase(&GamePhase::Meele);
+
+            if fortress1.get_health() > 0 {
+                if fortress1.is_in_meele_battle() {
+                    Game::full_meele_attack_to(
+                        &mut fortress2, 
+                        &mut fortress1, 
+                        0, 
+                        &mut roller);
+                } else {
+                    
+                }
+            }
+            if fortress2.get_health() > 0 {
+                if fortress2.is_in_meele_battle() {
+                    Game::full_meele_attack_to(
+                        &mut fortress1, 
+                        &mut fortress2, 
+                        0, 
+                        &mut roller);
+                } else {
+                    
+                }
+            }
+
             unit1_stat.push_data(&fortress1, moves as usize);
             unit2_stat.push_data(&fortress2 , moves as usize);
             moves += 1;
         }
         sum_moves += moves as u64;
-        if fortress1.get_health() == 0 {
+        if fortress1.get_health() <= 0 && fortress2.get_health() > 0 {
             unit2_wins += 1;
-        } else {
+        } 
+        if fortress2.get_health() <= 0 && fortress1.get_health() > 0 {
             unit1_wins += 1;
         }
     }
@@ -172,7 +212,7 @@ fn main() {
         (sum_moves as f32) / (stat_size as f32));
     warn!("Wins: {}:{}",
         unit1_wins, unit2_wins);
-        warn!("Wins (%): {}:{} ([{}],[{}])",
+        warn!("Wins (%): {:.1}:{:.1} ([{}],[{}])",
             unit1_wins as f32 / stat_size as f32 * 100.0, 
             unit2_wins as f32 / stat_size as f32 * 100.0,
             &unit1_stat.name,

@@ -1,11 +1,12 @@
 use crate::unit::Unit;
 use crate::{RolledValue, WahValue};
-use crate::weapon::{RangeWeapon, RangeWeaponType, StandardRangeWeapon};
+use crate::weapon::{RangeWeapon, RangeWeaponType, StandardRangeWeapon, MeeleWeapon};
 
 pub struct FortressOfRedemption {
     health : i32,
     weapons : Vec<Box<dyn RangeWeapon>>,
-    name : String
+    name : String,
+    meele_weapons : Vec<Box<dyn MeeleWeapon>>
 }
 
 impl FortressOfRedemption {
@@ -56,7 +57,8 @@ impl Default for FortressOfRedemption {
         Self {
             health : 30,
             weapons,
-            name : "Fortress of Redemption".to_string()
+            name : "Fortress of Redemption".to_string(),
+            meele_weapons : vec![]
         }
     }
 }
@@ -104,7 +106,7 @@ impl Unit for FortressOfRedemption {
         7
     }
 
-    fn add_damage(&mut self, damage: i32) -> i32{
+    fn add_damage(&mut self, damage : i32, s : i32) -> i32{
         self.health -= damage;
         damage
     }
@@ -115,5 +117,21 @@ impl Unit for FortressOfRedemption {
 
     fn set_phase(&mut self, phase : &crate::unit::GamePhase) {
         
+    }
+
+    fn get_ignore_ap(&self) -> i32 {
+        0
+    }
+
+    fn get_meele_attack_count(&self) -> WahValue {
+        WahValue::Fixed(0)
+    }
+
+    fn is_in_meele_battle(&self) -> bool {
+        false
+    }
+
+    fn get_meele_weapons(&self) -> &Vec<Box<dyn crate::weapon::MeeleWeapon>> {
+        &self.meele_weapons
     }
 }
