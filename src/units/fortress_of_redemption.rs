@@ -108,4 +108,12 @@ impl Unit for FortressOfRedemption {
         self.health -= damage;
         damage
     }
+
+    fn next_move(&mut self) {
+        
+    }
+
+    fn set_phase(&mut self, phase : &crate::unit::GamePhase) {
+        
+    }
 }

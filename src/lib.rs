@@ -34,8 +34,10 @@ impl Game {
         let weapons = unit.get_ranged_weapons();
         let mut sum_damage = 0;
         for w in weapons {
-            let damage = w.get_damage_to(unit, target, roller);
-            sum_damage += target.add_damage(damage);
+            let (damage, checked) = w.get_damage_to(unit, target, roller);
+            for idx in 0..checked {
+                sum_damage += target.add_damage(damage.get(roller));
+            }
         }
         warn!("[{}] Make {} damage to [{}]", unit.get_name(), sum_damage, target.get_name());
     }

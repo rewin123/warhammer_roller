@@ -3,6 +3,11 @@ use crate::Roller;
 use crate::weapon::RangeWeapon;
 use log::*;
 
+pub enum GamePhase {
+    Meele,
+    Shoot
+}
+
 pub trait Unit {
     fn get_name(&self) -> &String;
     fn get_health(&self) -> i32;
@@ -14,6 +19,8 @@ pub trait Unit {
     fn get_ranged_weapons(&self) -> &Vec<Box<dyn RangeWeapon>>;
     fn get_involve(&self) -> i32;
     fn add_damage(&mut self, damage : i32) -> i32;
+    fn next_move(&mut self);
+    fn set_phase(&mut self, phase : &GamePhase);
 
     fn pretty_report_ballistic_skill(&self, roller : &mut Roller) {
         let weapons = self.get_ranged_weapons();
